@@ -43,11 +43,11 @@ The project includes an "Automated Test Agent" to verify the interaction flow wi
 
 - **Run master test suite**:
   ```bash
-  python3 build_and_test.py
+  python3 tests/build_and_test.py
   ```
 - **Run individual tests**:
-  - `python3 test_runner.py` (Happy Path)
-  - `python3 test_error_paths.py` (Error recovery and timeouts)
+  - `python3 tests/test_runner.py` (Happy Path)
+  - `python3 tests/test_error_paths.py` (Error recovery and timeouts)
 
 ## Requirements
 

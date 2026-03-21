@@ -13,9 +13,9 @@ if build_process.returncode != 0:
     sys.exit(1)
 
 print("\n--- Running HAPPY PATH tests ---")
-subprocess.run(["python3", "test_runner.py"], cwd="/Users/Dara/Documents/Furhat-eye-tracking")
+subprocess.run(["python3", "tests/test_runner.py"], cwd="/Users/Dara/Documents/Furhat-eye-tracking")
 
 print("\n--- Running UNHAPPY PATH tests ---")
-subprocess.run(["python3", "test_error_paths.py"], cwd="/Users/Dara/Documents/Furhat-eye-tracking")
+subprocess.run(["python3", "tests/test_error_paths.py"], cwd="/Users/Dara/Documents/Furhat-eye-tracking")
 
 print("\n=== ALL TESTS COMPLETED ===")
