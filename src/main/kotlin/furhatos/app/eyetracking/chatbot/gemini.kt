@@ -10,13 +10,15 @@ val geminiServiceKey: String = "AIzaSyC5RnAkfM38jf0CYiT_h69ag_zwEWN7i7o"
 class GeminiAIChatbot(val systemPrompt: String) {
 
     private val apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent"
+    private val connectTimeoutMs = 2000
+    private val readTimeoutMs = 7000
 
     fun getResponse(): String {
         return try {
             val textParts = mutableListOf<String>()
             textParts.add(escapeJson(systemPrompt))
             
-            Furhat.dialogHistory.all.takeLast(6).forEach {
+            Furhat.dialogHistory.all.takeLast(4).forEach {
                 when (it) {
                     is DialogHistory.ResponseItem -> textParts.add(escapeJson(it.response.text))
                     is DialogHistory.UtteranceItem -> textParts.add(escapeJson(it.toText()))
@@ -27,7 +29,7 @@ class GeminiAIChatbot(val systemPrompt: String) {
             val requestBody = """
             {
               "contents": [ { "parts": [ $partsArray ] } ],
-              "generationConfig": { "temperature": 0.5, "maxOutputTokens": 512 }
+              "generationConfig": { "temperature": 0.5, "maxOutputTokens": 1024, "thinkingConfig": { "thinkingBudget": 600 } }
             }
             """.trimIndent()
 
@@ -35,18 +37,45 @@ class GeminiAIChatbot(val systemPrompt: String) {
             connection.requestMethod = "POST"
             connection.setRequestProperty("x-goog-api-key", geminiServiceKey)
             connection.setRequestProperty("Content-Type", "application/json")
+            connection.connectTimeout = connectTimeoutMs
+            connection.readTimeout = readTimeoutMs
             connection.doOutput = true
 
             connection.outputStream.bufferedWriter().use { it.write(requestBody) }
 
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 val response = connection.inputStream.bufferedReader().readText()
-                return parseGeminiResponse(response)
+                val result = parseGeminiResponse(response)
+                logTokenUsage(response)
+                connection.disconnect()
+                return result
             } else {
+                connection.disconnect()
                 "I'm sorry, my language module is currently unreachable."
             }
         } catch (e: Exception) {
             "I encountered an error processing your request."
+        }
+    }
+
+    private fun logTokenUsage(jsonResponse: String) {
+        try {
+            fun extractInt(key: String): Int {
+                val idx = jsonResponse.indexOf("\"$key\"")
+                if (idx == -1) return -1
+                val colon = jsonResponse.indexOf(':', idx)
+                val start = colon + 1
+                val end = jsonResponse.indexOfAny(charArrayOf(',', '}', '\n'), start)
+                if (end == -1) return -1
+                return jsonResponse.substring(start, end).trim().toIntOrNull() ?: -1
+            }
+            val prompt = extractInt("promptTokenCount")
+            val candidates = extractInt("candidatesTokenCount")
+            val thoughts = extractInt("thoughtsTokenCount")
+            val total = extractInt("totalTokenCount")
+            println(">>> GEMINI_TOKENS: prompt=$prompt  response=$candidates  thoughts=$thoughts  total=$total")
+        } catch (e: Exception) {
+            println(">>> GEMINI_TOKENS: (could not parse usage)")
         }
     }
 
@@ -102,25 +131,31 @@ Respond with ONLY the label.
         val requestBody = """
         {
           "contents": [{"parts": [{"text": "${prompt.replace("\n", "\\n").replace("\"", "\\\"")}"}]}],
-          "generationConfig": {"temperature": 0.0, "maxOutputTokens": 256}
+          "generationConfig": {"temperature": 0.0, "maxOutputTokens": 650, "thinkingConfig": {"thinkingBudget": 450}}
         }
         """.trimIndent()
         val connection = java.net.URL(apiUrl).openConnection() as java.net.HttpURLConnection
         connection.requestMethod = "POST"
         connection.setRequestProperty("x-goog-api-key", geminiServiceKey)
         connection.setRequestProperty("Content-Type", "application/json")
+        connection.connectTimeout = 2000
+        connection.readTimeout = 5000
         connection.doOutput = true
         connection.outputStream.bufferedWriter().use { it.write(requestBody) }
         
         if (connection.responseCode == java.net.HttpURLConnection.HTTP_OK) {
             val response = connection.inputStream.bufferedReader().readText()
+            connection.disconnect()
             val textIdx = response.indexOf("\"text\"")
             if (textIdx == -1) return "unclear"
             val colonIdx = response.indexOf(':', textIdx)
             val startQuote = response.indexOf('"', colonIdx + 1)
             val endQuote = response.indexOf('"', startQuote + 1)
             response.substring(startQuote + 1, endQuote).replace("\\n", "").trim().lowercase()
-        } else "unclear"
+        } else {
+            connection.disconnect()
+            "unclear"
+        }
     } catch (e: Exception) {
         "unclear"
     }
