@@ -24,6 +24,8 @@ def say(text):
     safe_text = text.replace("'", "'\\''")
     subprocess.Popen(f"sleep 1 && say -v Samantha '{safe_text}'", shell=True)
 
+task1_responses = 0
+
 try:
     for line in iter(process.stdout.readline, ''):
         print(line, end="")
@@ -44,11 +46,19 @@ try:
         elif ">>> ROBOT_LISTENING: PRE_TASK1" in line or ">>> ROBOT_LISTENING: PRE_TASK1_RETRY" in line:
             say("I have rested. I am ready to begin the first task.")
             
+        elif ">>> ROBOT_LISTENING: TASK1_CONVERSATION" in line or ">>> ROBOT_LISTENING: TASK1_CONVERSATION_RETRY" in line:
+            task1_responses += 1
+            if task1_responses == 1:
+                say("The language barrier was definitely the most challenging part, but it was a great learning experience.")
+            elif task1_responses == 2:
+                say("I also found the food to be completely incredible, even if I did not always know what I was ordering.")
+            elif task1_responses == 3:
+                say("Overall, I would highly recommend it to anyone who likes exploring new cultures.")
+            elif task1_responses == 4:
+                say("Well, another thing is that the public transportation was surprisingly easy to navigate.")
+            
         elif ">>> ROBOT_LISTENING: TASK1" in line or ">>> ROBOT_LISTENING: TASK1_RETRY" in line:
             say("My favorite travel destination is Kyoto, Japan, because of its beautiful temples and peaceful gardens.")
-            
-        elif ">>> ROBOT_LISTENING: TASK1_FOLLOWUP" in line or ">>> ROBOT_LISTENING: TASK1_FOLLOWUP_RETRY" in line:
-            say("The language barrier was definitely the most challenging part, but it was a great learning experience.")
             
         # 5. TASK 2
         elif ">>> ROBOT_LISTENING: PRE_TASK2" in line or ">>> ROBOT_LISTENING: PRE_TASK2_RETRY" in line:

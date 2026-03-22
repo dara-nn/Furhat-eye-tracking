@@ -40,6 +40,7 @@ first_calibration = True
 first_pre_task1 = True
 first_task1 = True
 first_pre_task2 = True
+first_consent_retry = True
 first_glasses_retry = True
 first_calibration_retry = True
 first_pre_task1_retry = True
@@ -50,12 +51,15 @@ try:
         
         # ---- CONSENT ----
         if (">>> ROBOT_LISTENING: CONSENT_RETRY" in line) and not passed_consent:
-            # Always answer yes on retry
-            passed_consent = True
-            say("Okay, yes I consent to that.")
+            if first_consent_retry:
+                first_consent_retry = False
+                say("Wait, what exactly are you recording?")
+            else:
+                passed_consent = True
+                say("Okay, yes I consent to that.")
         elif (">>> ROBOT_LISTENING: CONSENT" in line) and not passed_consent and first_consent:
             first_consent = False
-            say("Wait, what exactly are you recording?")
+            say("No, I don't think I want to do this.")
         
         # ---- GLASSES ----
         elif (">>> ROBOT_LISTENING: GLASSES_RETRY" in line) and not passed_glasses:
@@ -94,13 +98,10 @@ try:
             say("I need a minute to rest.")
         
         # ---- TASK 1 (silence then answer) ----
-        elif (">>> ROBOT_LISTENING: TASK1_RETRY" in line) and not passed_task1:
-            passed_task1 = True
-            say("My favorite trip was to France, the food was amazing.")
-        elif (">>> ROBOT_LISTENING: TASK1_FOLLOWUP_RETRY" in line) and not passed_task1_followup:
+        elif (">>> ROBOT_LISTENING: TASK1_CONVERSATION_RETRY" in line):
             passed_task1_followup = True
             say("The flight there was definitely the hardest part.")
-        elif (">>> ROBOT_LISTENING: TASK1_FOLLOWUP" in line) and not passed_task1_followup:
+        elif (">>> ROBOT_LISTENING: TASK1_CONVERSATION" in line):
             passed_task1_followup = True
             say("The flight there was definitely the hardest part.")
         elif (">>> ROBOT_LISTENING: TASK1" in line) and first_task1:
