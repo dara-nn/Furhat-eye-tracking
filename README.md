@@ -34,6 +34,47 @@ tests/
 └── build_and_test.py    # Master test suite
 ```
 
+## Conversation Flow
+
+```mermaid
+flowchart TD
+    START([Start]) --> BC
+
+    BC["BriefingAndConsent\nGreeting & consent request"]
+    CG["CheckGlasses\nTobii glasses on?"]
+    TC["TobiiCalibration\nCalibration ready?"]
+    PT1["PreTask1Transition\nRelax & confirm ready"]
+    T1["Task1: Conversation\nOpen-ended travel question\n⏱ max 2.5 min"]
+    PT2["PreTask2Transition\nBreak & confirm ready"]
+    T2["Task2: Listening\nAI history monologue\n+ reaction question"]
+    CON["Conclusion\nGoodbye & glasses off"]
+    END([End])
+
+    BC -->|consent| CG
+    BC -->|"refused twice or silent"| END
+
+    CG -->|glasses on| TC
+    CG -->|silent x3| END
+
+    TC -->|calibrated| PT1
+    TC -->|silent x3| END
+
+    PT1 -->|ready| T1
+    PT1 -->|silent x3| END
+
+    T1 -->|"Gemini reply → listen again"| T1
+    T1 -->|time limit reached| PT2
+    T1 -->|silent x3| END
+
+    PT2 -->|ready| T2
+    PT2 -->|silent x3| END
+
+    T2 -->|"yes / no / unclear"| CON
+    CON --> END
+```
+
+> At each checkpoint, participant questions are answered live by the Gemini chatbot before re-listening.
+
 ## Setup
 
 1. **Build**:
