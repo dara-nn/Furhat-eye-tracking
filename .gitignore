@@ -22,3 +22,11 @@ local.properties
 test_mode.txt
 compile_error.txt
 *.log
+
+# Furhat SDK runtime artifacts
+properties/
+dynamicLibrary/
+
+# Tool internals
+.agent/
+.claude/
