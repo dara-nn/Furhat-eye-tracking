@@ -85,7 +85,27 @@ flowchart TD
    ```bash
    ./gradlew run
    ```
-3. **API Key**: Set your Gemini API key in `src/main/kotlin/furhatos/app/eyetracking/chatbot/gemini.kt`.
+3. **API Key**: The app reads your Gemini API key from the `GEMINI_API_KEY` environment variable. **Never hardcode your key in source files.**
+
+   **Option A — environment variable (recommended):**
+   ```bash
+   export GEMINI_API_KEY="your-key-here"
+   ./gradlew run
+   ```
+
+   **Option B — `local.properties` file (local dev convenience):**
+
+   Create a `local.properties` file in the project root (it is already gitignored):
+   ```
+   GEMINI_API_KEY=your-key-here
+   ```
+   Then load it in your shell before running:
+   ```bash
+   export $(grep -v '^#' local.properties | xargs)
+   ./gradlew run
+   ```
+
+   Get a key at [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ## Automated Testing
 

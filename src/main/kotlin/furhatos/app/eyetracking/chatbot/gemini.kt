@@ -5,7 +5,7 @@ import furhatos.flow.kotlin.Furhat
 import java.net.HttpURLConnection
 import java.net.URL
 
-val geminiServiceKey: String = "AIzaSyC5RnAkfM38jf0CYiT_h69ag_zwEWN7i7o"
+val geminiServiceKey: String = System.getenv("GEMINI_API_KEY") ?: ""
 
 class GeminiAIChatbot(val systemPrompt: String) {
 
