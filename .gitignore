@@ -1,0 +1,32 @@
+# Gradle
+.gradle/
+build/
+
+# Kotlin / IntelliJ
+.idea/
+*.iml
+out/
+.kotlin/
+
+# OS / Editor
+.DS_Store
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Local sensitive files
+local.properties
+test_mode.txt
+compile_error.txt
+*.log
+
+# Furhat SDK runtime artifacts
+properties/
+dynamicLibrary/
+
+# Tool internals
+.agent/
+.claude/
