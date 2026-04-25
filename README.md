@@ -1,6 +1,10 @@
 # Furhat Eye-Tracking Research Study
 
-An automated FurhatOS skill for an eye-tracking research study. The robot assistant (**Iris**) wakes on a greeting, requests consent, then holds an open-ended conversation while eye-tracking data is recorded externally.
+An automated FurhatOS skill built for a research study on human gaze behavior during conversation with a humanoid robot. The robot assistant (**Iris**) wakes on a greeting, requests verbal consent, then holds an open-ended conversation while the participant's gaze is recorded externally with Tobii Pro Glasses 3.
+
+The study tests whether two well-established gaze patterns from human-to-human conversation, turn-taking regulation and the listener-speaker asymmetry, still hold when the conversation partner is a humanoid robot. Five participants completed a ten-minute conversation with Iris.
+
+The data, analysis scripts, and full write-up live in the companion repository: [dara-nn/Furhat-eye-tracking-Analysis](https://github.com/dara-nn/Furhat-eye-tracking-Analysis).
 
 ## Features
 
